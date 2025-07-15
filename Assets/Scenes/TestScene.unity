@@ -258,7 +258,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveSpeed: 5
-  animatorController: {fileID: 0}
+  animatorController: {fileID: 225264992}
 --- !u!114 &225264989
 MonoBehaviour:
   m_ObjectHideFlags: 0
