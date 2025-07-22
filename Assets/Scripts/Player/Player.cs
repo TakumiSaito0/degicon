@@ -6,7 +6,7 @@ public class Player : MonoBehaviour
     [SerializeField] private float moveSpeed = 5f;
     private Vector2 moveInput;
     private PlayerInputActions playerInput;
-    private bool facingRight = true;
+    public bool facingRight = true;
 
     // AnimatorController�Q��
     [SerializeField] private AnimatorController animatorController;
@@ -19,6 +19,9 @@ public class Player : MonoBehaviour
 
     [SerializeField] private Vector3 attackBoxSize = new Vector3(1f, 1f, 1f); // 判定ボックスサイズ
     [SerializeField] public int attackPower = 1; // 攻撃力
+
+    private bool isInvincible = false; // 無敵状態フラグ
+    private int health = 3; // プレイヤーのHP
 
     private void OnEnable()
     {
@@ -78,7 +81,13 @@ public class Player : MonoBehaviour
                 {
                     Debug.Log($"敵に攻撃！攻撃力: {attackPower}");
                     hitEnemy = true;
-                    // ここで敵のHPを減らす処理などを追加可能
+                    // EnemyのHPを減らす処理
+                    var enemyScript = hit.gameObject.GetComponent<Enemy>();
+                    if (enemyScript != null)
+                    {
+                        enemyScript.TakeDamage(attackPower);
+                        Debug.Log($"Enemyに{attackPower}ダメージを与えた");
+                    }
                 }
             }
             if (!hitEnemy)
@@ -177,5 +186,45 @@ public class Player : MonoBehaviour
         float offset = facingRight ? 0.5f : -0.5f;
         Vector3 attackCenter = transform.position + new Vector3(offset, 0.7f, 0);
         Gizmos.DrawWireCube(attackCenter, attackBoxSize);
+    }
+
+   
+
+    public bool IsInvincible()
+    {
+        return isInvincible;
+    }
+
+    public void TakeDamage(int damage)
+    {
+        if (isInvincible) return;
+        health -= damage;
+        Debug.Log($"ダメージ！残りHP: {health}");
+        if (LifeManager.instance != null)
+        {
+            LifeManager.instance.TakeDamage(damage);
+        }
+        if (health <= 0)
+        {
+            Debug.Log("プレイヤー死亡");
+            // 死亡処理
+        }
+        else
+        {
+            StartCoroutine(InvincibleCoroutine());
+        }
+    }
+
+    public void StartInvincibility()
+    {
+        if (!isInvincible)
+            StartCoroutine(InvincibleCoroutine());
+    }
+
+    private System.Collections.Generic.IEnumerator<UnityEngine.WaitForSeconds> InvincibleCoroutine()
+    {
+        isInvincible = true;
+        yield return new UnityEngine.WaitForSeconds(2f);
+        isInvincible = false;
     }
 }

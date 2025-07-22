@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 
 public class PlayerSkill : MonoBehaviour
 {
@@ -6,12 +7,12 @@ public class PlayerSkill : MonoBehaviour
     public enum ColorType { Red, Blue, Green, Yellow }
 
     [SerializeField] private Player player; // Player参照
-    [SerializeField] private GameObject effectPrefab; // エフェクトPrefab
+    [SerializeField] private GameObject fireEffectPrefab; // 黒赤スキル用エフェクト
+    [SerializeField] private GameObject whiteRedEffectPrefab; // 白赤スキル用エフェクト
 
     private ModeType currentMode = ModeType.White;
-
-    private float lastSkillTime = -999f;
-    private float skillCooldown = 5f;
+    private float lastWhiteRedSkillTime; // 白赤スキルのクールタイム管理
+    private float lastBlackRedSkillTime; // 黒赤スキルのクールタイム管理
 
     void Update()
     {
@@ -34,40 +35,76 @@ public class PlayerSkill : MonoBehaviour
     {
         if (currentMode == ModeType.White && color == ColorType.Red)
         {
-            // クールタイム判定
-            if (Time.time - lastSkillTime < skillCooldown)
+            const float whiteRedSkillCooldown = 30f;
+            const float attackUpDuration = 5f;
+
+            if (player != null && whiteRedEffectPrefab != null)
             {
-                Debug.Log("スキルはクールタイム中です");
-                return;
-            }
-
-            lastSkillTime = Time.time;
-
-            if (player != null)
-            {
-                player.attackPower = Mathf.RoundToInt(player.attackPower * 1.5f);
-                Debug.Log($"白の赤魔法発動！攻撃力: {player.attackPower}");
-
-                // エフェクト発動（1秒後に消す）
-                if (effectPrefab != null)
+                // クールタイム判定
+                if (Time.time - lastWhiteRedSkillTime < whiteRedSkillCooldown)
                 {
-                    GameObject effect = Instantiate(effectPrefab, player.transform.position, Quaternion.identity);
-                    Destroy(effect, 1f);
-                    Debug.Log("白モードの赤魔法エフェクト発動！（1秒後に消滅）");
+                    Debug.Log("白赤スキルはクールタイム中です");
+                    return;
                 }
-                else
-                {
-                    Debug.Log("effectPrefabがアタッチされていません");
-                }
+                lastWhiteRedSkillTime = Time.time;
+
+                // 攻撃力アップ（5秒間のみ）
+                int originalAttackPower = player.attackPower;
+                player.attackPower = Mathf.RoundToInt(originalAttackPower * 1.5f);
+                Debug.Log($"白の赤魔法発動！攻撃力: {player.attackPower}（5秒間アップ）");
+
+                StartCoroutine(ResetAttackPowerAfterDelay(attackUpDuration, originalAttackPower));
+
+                // 白モードの赤魔法エフェクト発動（Y座標を1f下げて生成、1秒後に消す）
+                Vector3 spawnPos = player.transform.position + new Vector3(0, 0f, 0);
+                GameObject effect = Instantiate(whiteRedEffectPrefab, spawnPos, Quaternion.identity);
+                Destroy(effect, 1f);
+                Debug.Log("白モードの赤魔法エフェクト発動！（1秒後に消滅）");
             }
             else
             {
-                Debug.Log("Player参照がありません");
+                Debug.Log("Player参照またはwhiteRedEffectPrefabがありません");
+            }
+        }
+        else if (currentMode == ModeType.Black && color == ColorType.Red)
+        {
+            const float blackRedSkillCooldown = 7f;
+            if (player != null && fireEffectPrefab != null)
+            {
+                // クールタイム判定
+                if (Time.time - lastBlackRedSkillTime < blackRedSkillCooldown)
+                {
+                    Debug.Log("黒赤スキルはクールタイム中です");
+                    return;
+                }
+                lastBlackRedSkillTime = Time.time;
+
+                // Playerの向きで発射方向を決定
+                bool isRight = player.facingRight;
+                float xOffset = isRight ? 1f : -1f;
+                Vector3 spawnPos = player.transform.position + new Vector3(xOffset, 0.5f, 0);
+                Quaternion rot = isRight ? Quaternion.identity : Quaternion.Euler(0, 180f, 0);
+                GameObject fire = Instantiate(fireEffectPrefab, spawnPos, rot);
+                Debug.Log("黒の赤魔法発動！炎エフェクト生成（横に進む）");
+            }
+            else
+            {
+                Debug.Log("Player参照またはfireEffectPrefabがありません");
             }
         }
         else
         {
             Debug.Log($"現在は{currentMode}の{color}を発動しました");
+        }
+    }
+
+    private IEnumerator ResetAttackPowerAfterDelay(float delay, int originalPower)
+    {
+        yield return new WaitForSeconds(delay);
+        if (player != null)
+        {
+            player.attackPower = originalPower;
+            Debug.Log($"攻撃力が元に戻りました: {player.attackPower}");
         }
     }
 }

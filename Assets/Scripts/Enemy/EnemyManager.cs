@@ -282,36 +282,29 @@ public class EnemyManager : MonoBehaviour
     void AttackPlayer()
     {
         if (!canAttack) return;
-        
+
         canAttack = false;
         lastAttackTime = Time.time;
-        
+
         // プレイヤーにダメージを与える
         if (player != null)
         {
-            PlayerManager playerManager = player.GetComponent<PlayerManager>();
-            if (playerManager != null)
+            Player playerScript = player.GetComponent<Player>();
+            if (playerScript != null)
             {
                 // プレイヤーの無敵時間をチェック
-                if (!playerManager.IsInvincible())
+                if (!playerScript.IsInvincible())
                 {
-                    // LifeManagerを通じてダメージを与える
-                    if (LifeManager.instance != null)
-                    {
-                        LifeManager.instance.TakeDamage(damage);
-                        
-                        // プレイヤーの無敵時間を開始
-                        playerManager.StartInvincibility();
-                        
-                        Debug.Log($"敵がプレイヤーを攻撃しました！ダメージ: {damage}");
-                    }
+                    playerScript.TakeDamage(damage); // PlayerのTakeDamageを直接呼び出す
+                    playerScript.StartInvincibility(); // Playerの無敵時間開始
+                    Debug.Log($"敵がプレイヤーを攻撃しました！ダメージ: {damage}");
                 }
             }
         }
-        
+
         // 攻撃エフェクト（簡単な色変更）
         StartCoroutine(AttackEffect());
-        
+
         // 攻撃クールダウン
         StartCoroutine(AttackCooldown());
     }
