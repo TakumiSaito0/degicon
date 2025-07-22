@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI; // UI操作用
 
 public class LifeManager : MonoBehaviour
@@ -8,6 +9,9 @@ public class LifeManager : MonoBehaviour
 
     // ハート画像の配列（Inspectorで設定）
     public Image[] heartImages;
+
+    [SerializeField] private GameObject gameOverPanel; // InspectorでゲームオーバーUIをセット
+
 
     // 通常のハート画像（Inspectorで設定）
     public Sprite heartFullSprite;
@@ -62,6 +66,16 @@ public class LifeManager : MonoBehaviour
     {
         Debug.Log("プレイヤーが死亡しました");
         // ここにゲームオーバー処理を追加
+        if (gameOverPanel != null)
+        {
+            gameOverPanel.SetActive(true); // ゲームオーバーUIを表示
+        }
+    }
+    // リトライボタンから呼び出す
+    public void OnRetryButton()
+    {
+        // 現在のシーンを再読み込み
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
     // ハート画像の表示更新
