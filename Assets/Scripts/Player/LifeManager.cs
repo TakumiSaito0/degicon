@@ -75,21 +75,17 @@ public class LifeManager : MonoBehaviour
     {
         Debug.Log("プレイヤーが死亡しました");
         // ここにゲームオーバー処理を追加
+       
         if (gameOverPanel != null)
         {
             gameOverPanel.SetActive(true); // ゲームオーバーUIを表示
         }
         if (mainLight != null) mainLight.intensity = 0.3f; // 暗くする
-        // プレイヤーの動作を完全停止
-        var player = FindObjectOfType<Player>();
-        if (player != null) player.SetDead(true);
         Time.timeScale = 0f; // ゲームを停止
     }
     // リトライボタンから呼び出す
     public void OnRetryButton()
     {
-        var player = FindObjectOfType<Player>();
-        if (player != null) player.SetDead(false);
         if (mainLight != null) mainLight.intensity = originalIntensity; // 元に戻す
         Time.timeScale = 1f; // 時間を元に戻す
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);

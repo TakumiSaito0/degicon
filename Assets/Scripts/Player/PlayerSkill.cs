@@ -35,7 +35,7 @@ public class PlayerSkill : MonoBehaviour
     {
         if (currentMode == ModeType.White && color == ColorType.Red)
         {
-            const float whiteRedSkillCooldown = 30f;
+            const float whiteRedSkillCooldown = 4f;
             const float attackUpDuration = 5f;
 
             if (player != null && whiteRedEffectPrefab != null)
