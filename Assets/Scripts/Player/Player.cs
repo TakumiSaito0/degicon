@@ -22,7 +22,7 @@ public class Player : MonoBehaviour
 
     private bool isInvincible = false; // 無敵状態フラグ
     private int health = 3; // プレイヤーのHP
-    private bool isDead = false; // 死亡フラグ
+    private bool isDead = false;
 
     private void OnEnable()
     {
@@ -44,26 +44,12 @@ public class Player : MonoBehaviour
         playerInput.Player.Disable();
     }
 
-    public void SetDead(bool value)
-    {
-        isDead = value;
-        if (isDead)
-        {
-            moveInput = Vector2.zero;
-            // Rigidbodyの速度も止める
-            var rb = GetComponent<Rigidbody>();
-            if (rb != null) rb.linearVelocity = Vector3.zero;
-        }
-    }
-
     public void OnMove(InputAction.CallbackContext context)
     {
-        if (isDead) return;
         moveInput = context.ReadValue<Vector2>();
     }
     public void OnJump(InputAction.CallbackContext context)
     {
-        if (isDead) return;
         if (animatorController != null)
         {
             animatorController.SetInt("Animation,16"); // Jump
@@ -78,11 +64,10 @@ public class Player : MonoBehaviour
     }
     public void OnAttack(InputAction.CallbackContext context)
     {
-        if (isDead) return;
         if (animatorController != null && !isAttacking)
         {
             animatorController.SetInt("Animation,2"); // Attack
-            Debug.Log("Attack Animation Triggered (2)");
+         //   Debug.Log("Attack Animation Triggered (2)");
             isAttacking = true;
             attackTimer = attackDuration;
 
@@ -95,7 +80,7 @@ public class Player : MonoBehaviour
             {
                 if (hit != null && hit.gameObject != null && hit.gameObject.CompareTag("Enemy"))
                 {
-                    Debug.Log($"敵に攻撃！攻撃力: {attackPower}");
+              //      Debug.Log($"敵に攻撃！攻撃力: {attackPower}");
                     hitEnemy = true;
                     // EnemyのHPを減らす処理
                     var enemyScript = hit.gameObject.GetComponent<Enemy>();
@@ -216,14 +201,14 @@ public class Player : MonoBehaviour
     {
         if (isInvincible) return;
         health -= damage;
-        Debug.Log($"ダメージ！残りHP: {health}");
+   //     Debug.Log($"ダメージ！残りHP: {health}");
         if (LifeManager.instance != null)
         {
             LifeManager.instance.TakeDamage(damage);
         }
         if (health <= 0)
         {
-            Debug.Log("プレイヤー死亡");
+       //     Debug.Log("プレイヤー死亡");
             // 死亡処理
         }
         else
@@ -236,6 +221,34 @@ public class Player : MonoBehaviour
     {
         if (!isInvincible)
             StartCoroutine(InvincibleCoroutine());
+    }
+
+    public void SetDead(bool dead)
+    {
+        isDead = dead;
+        if (dead)
+        {
+            // 入力・物理停止
+            moveInput = Vector2.zero;
+            var rb = GetComponent<Rigidbody>();
+            if (rb != null)
+            {
+                rb.linearVelocity = Vector3.zero;
+                rb.isKinematic = true;
+            }
+            if (animatorController != null)
+            {
+                animatorController.SetFloat("Speed,0");
+            }
+        }
+        else
+        {
+            var rb = GetComponent<Rigidbody>();
+            if (rb != null)
+            {
+                rb.isKinematic = false;
+            }
+        }
     }
 
     private System.Collections.Generic.IEnumerator<UnityEngine.WaitForSeconds> InvincibleCoroutine()
