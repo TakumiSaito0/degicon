@@ -11,7 +11,8 @@ public class LifeManager : MonoBehaviour
     public Image[] heartImages;
 
     [SerializeField] private GameObject gameOverPanel; // InspectorでゲームオーバーUIをセット
-
+   
+    [SerializeField] private Light mainLight;
 
     // 通常のハート画像（Inspectorで設定）
     public Sprite heartFullSprite;
@@ -21,6 +22,8 @@ public class LifeManager : MonoBehaviour
 
     // シングルトンインスタンス
     public static LifeManager instance;
+
+    private float originalIntensity;
 
     void Awake()
     {
@@ -34,6 +37,12 @@ public class LifeManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
+    }
+
+    void Start()
+    {
+        UpdateHearts();
+        if (mainLight != null) originalIntensity = mainLight.intensity;
     }
 
     public void TakeDamage(int damage = 1)
@@ -70,11 +79,19 @@ public class LifeManager : MonoBehaviour
         {
             gameOverPanel.SetActive(true); // ゲームオーバーUIを表示
         }
+        if (mainLight != null) mainLight.intensity = 0.3f; // 暗くする
+        // プレイヤーの動作を完全停止
+        var player = FindObjectOfType<Player>();
+        if (player != null) player.SetDead(true);
+        Time.timeScale = 0f; // ゲームを停止
     }
     // リトライボタンから呼び出す
     public void OnRetryButton()
     {
-        // 現在のシーンを再読み込み
+        var player = FindObjectOfType<Player>();
+        if (player != null) player.SetDead(false);
+        if (mainLight != null) mainLight.intensity = originalIntensity; // 元に戻す
+        Time.timeScale = 1f; // 時間を元に戻す
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
@@ -92,11 +109,6 @@ public class LifeManager : MonoBehaviour
                 heartImages[i].sprite = heartEmptySprite;
             }
         }
-    }
-
-    void Start()
-    {
-        UpdateHearts(); // 初期表示
     }
 
     // 現在の体力を取得

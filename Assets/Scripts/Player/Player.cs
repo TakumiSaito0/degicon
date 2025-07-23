@@ -22,6 +22,7 @@ public class Player : MonoBehaviour
 
     private bool isInvincible = false; // 無敵状態フラグ
     private int health = 3; // プレイヤーのHP
+    private bool isDead = false; // 死亡フラグ
 
     private void OnEnable()
     {
@@ -43,12 +44,26 @@ public class Player : MonoBehaviour
         playerInput.Player.Disable();
     }
 
+    public void SetDead(bool value)
+    {
+        isDead = value;
+        if (isDead)
+        {
+            moveInput = Vector2.zero;
+            // Rigidbodyの速度も止める
+            var rb = GetComponent<Rigidbody>();
+            if (rb != null) rb.linearVelocity = Vector3.zero;
+        }
+    }
+
     public void OnMove(InputAction.CallbackContext context)
     {
+        if (isDead) return;
         moveInput = context.ReadValue<Vector2>();
     }
     public void OnJump(InputAction.CallbackContext context)
     {
+        if (isDead) return;
         if (animatorController != null)
         {
             animatorController.SetInt("Animation,16"); // Jump
@@ -63,6 +78,7 @@ public class Player : MonoBehaviour
     }
     public void OnAttack(InputAction.CallbackContext context)
     {
+        if (isDead) return;
         if (animatorController != null && !isAttacking)
         {
             animatorController.SetInt("Animation,2"); // Attack
@@ -103,6 +119,7 @@ public class Player : MonoBehaviour
 
     void Update()
     {
+        if (isDead) return;
         Debug.Log("Update called"); // ���ꂪ�o�͂���邩�m�F
         // ���E�ړ��̂�
         Vector3 move = new Vector3(moveInput.x, 0, 0) * moveSpeed * Time.deltaTime;
