@@ -36,7 +36,7 @@ public class PlayerSkill : MonoBehaviour
         if (currentMode == ModeType.White && color == ColorType.Red)
         {
             const float whiteRedSkillCooldown = 4f;
-            const float attackUpDuration = 5f;
+            const float blackRedSkillCooldown = 5f;
 
             if (player != null && whiteRedEffectPrefab != null)
             {
@@ -53,7 +53,7 @@ public class PlayerSkill : MonoBehaviour
                 player.attackPower = Mathf.RoundToInt(originalAttackPower * 1.5f);
                 Debug.Log($"白の赤魔法発動！攻撃力: {player.attackPower}（5秒間アップ）");
 
-                StartCoroutine(ResetAttackPowerAfterDelay(attackUpDuration, originalAttackPower));
+                StartCoroutine(ResetAttackPowerAfterDelay(blackRedSkillCooldown, originalAttackPower));
 
                 // 白モードの赤魔法エフェクト発動（Y座標を1f下げて生成、1秒後に消す）
                 Vector3 spawnPos = player.transform.position + new Vector3(0, 0f, 0);
