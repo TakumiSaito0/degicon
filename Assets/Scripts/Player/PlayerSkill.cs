@@ -11,8 +11,8 @@ public class PlayerSkill : MonoBehaviour
     [SerializeField] private GameObject whiteRedEffectPrefab; // 白赤スキル用エフェクト
 
     private ModeType currentMode = ModeType.White;
-    private float lastWhiteRedSkillTime; // 白赤スキルのクールタイム管理
-    private float lastBlackRedSkillTime; // 黒赤スキルのクールタイム管理
+    private float lastWhiteRedSkillTime = -4f; // 白赤スキルのクールタイム管理（初期値を-クールタイムに）
+    private float lastBlackRedSkillTime = -7f; // 黒赤スキルのクールタイム管理（初期値を-クールタイムに）
 
     void Update()
     {
@@ -36,7 +36,7 @@ public class PlayerSkill : MonoBehaviour
         if (currentMode == ModeType.White && color == ColorType.Red)
         {
             const float whiteRedSkillCooldown = 4f;
-            const float blackRedSkillCooldown = 5f;
+            const float blackRedSkillCooldown = 7f;
 
             if (player != null && whiteRedEffectPrefab != null)
             {
