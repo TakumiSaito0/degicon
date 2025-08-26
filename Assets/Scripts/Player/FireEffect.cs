@@ -24,7 +24,12 @@ public class FireEffect : MonoBehaviour
     {
         if (other.CompareTag("Enemy"))
         {
-            // �����œG�Ƀ_���[�W�����Ȃǂ�ǉ��\
+            var enemyScript = other.GetComponent<Enemy>();
+            if (enemyScript != null)
+            {
+                enemyScript.TakeDamage(1); // 敵に1ダメージ
+                Debug.Log("ファイアーが敵に1ダメージを与えました");
+            }
             Destroy(gameObject);
         }
     }

@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class SkillUIManager : MonoBehaviour
 {
@@ -11,18 +12,26 @@ public class SkillUIManager : MonoBehaviour
     [SerializeField] private Image backgroundBlack;
     [SerializeField] private Image[] skillIconsWhite; // 赤青黄緑（白モード用）
     [SerializeField] private Image[] skillIconsBlack; // 赤青黃緑（黒モード用）
-    [SerializeField] private Text[] cooldownTextsWhite; // 赤青黄緑（白モード用）
-    [SerializeField] private Text[] cooldownTextsBlack; // 赤青黃緑（黒モード用）
-    [SerializeField] private Text modeText;
+    [SerializeField] private TextMeshProUGUI[] cooldownTextsWhite; // 赤青黄緑（白モード用）
+    [SerializeField] private TextMeshProUGUI[] cooldownTextsBlack; // 赤青黃緑（黒モード用）
+    // [SerializeField] private Text modeText; // モードテキスト削除
     
 
     private ModeType currentMode = ModeType.White;
     private float[,] cooldowns = new float[2, 4]; // [mode, color]
-    private float[,] cooldownMax = new float[2, 4] { {4,5,5,5}, {5,5,5,5} }; // 例: 全スキル5秒
+    private float[,] cooldownMax = new float[2, 4] { {4,5,5,5}, {7,5,5,5} }; // 例: 全スキル5秒
 
     void Start()
     {
         // Qキーで切り替えるのでボタンイベントは不要
+        // 全スキルのクールタイムを0に初期化（ゲーム開始直後から使用可能）
+        for (int m = 0; m < 2; m++)
+        {
+            for (int c = 0; c < 4; c++)
+            {
+                cooldowns[m, c] = 0f;
+            }
+        }
         UpdateUI();
     }
 
@@ -32,6 +41,11 @@ public class SkillUIManager : MonoBehaviour
         if (UnityEngine.InputSystem.Keyboard.current != null && UnityEngine.InputSystem.Keyboard.current.qKey.wasPressedThisFrame)
         {
             ChangeMode();
+        }
+        // Iキーで赤スキル発動（テスト用）
+        if (UnityEngine.InputSystem.Keyboard.current != null && UnityEngine.InputSystem.Keyboard.current.iKey.wasPressedThisFrame)
+        {
+            UseSkill(ColorType.Red);
         }
         // クールタイム減算
         for (int m = 0; m < 2; m++)
@@ -76,7 +90,7 @@ public class SkillUIManager : MonoBehaviour
             cooldownTextsWhite[i].gameObject.SetActive(currentMode == ModeType.White);
             cooldownTextsBlack[i].gameObject.SetActive(currentMode == ModeType.Black);
         }
-        modeText.text = currentMode == ModeType.White ? "白" : "黒";
+        // modeText.text = ... 削除
         UpdateCooldownUI();
     }
 
@@ -85,11 +99,25 @@ public class SkillUIManager : MonoBehaviour
         int m = (int)currentMode;
         for (int i = 0; i < 4; i++)
         {
-            float cd = Mathf.Max(0, cooldowns[m, i]);
-            if (currentMode == ModeType.White)
-                cooldownTextsWhite[i].text = cd > 0 ? cd.ToString("F1") : "Ready";
+            // 0未満になったら0に固定
+            if (cooldowns[m, i] < 0) cooldowns[m, i] = 0;
+            float cd = cooldowns[m, i];
+            if (cd > 0)
+            {
+                // カウントダウン表示（整数秒）
+                if (currentMode == ModeType.White)
+                    cooldownTextsWhite[i].text = Mathf.CeilToInt(cd).ToString();
+                else
+                    cooldownTextsBlack[i].text = Mathf.CeilToInt(cd).ToString();
+            }
             else
-                cooldownTextsBlack[i].text = cd > 0 ? cd.ToString("F1") : "Ready";
+            {
+                // Ready表示
+                if (currentMode == ModeType.White)
+                    cooldownTextsWhite[i].text = "Ready";
+                else
+                    cooldownTextsBlack[i].text = "Ready";
+            }
         }
     }
 }
