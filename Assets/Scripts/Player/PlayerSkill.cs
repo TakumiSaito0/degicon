@@ -9,10 +9,21 @@ public class PlayerSkill : MonoBehaviour
     [SerializeField] private Player player; // Player参照
     [SerializeField] private GameObject fireEffectPrefab; // 黒赤スキル用エフェクト
     [SerializeField] private GameObject whiteRedEffectPrefab; // 白赤スキル用エフェクト
+    [SerializeField] private GameObject whiteBlueEffectPrefab; // 白青スキル用エフェクト
 
     private ModeType currentMode = ModeType.White;
     private float lastWhiteRedSkillTime = -4f; // 白赤スキルのクールタイム管理（初期値を-クールタイムに）
     private float lastBlackRedSkillTime = -7f; // 黒赤スキルのクールタイム管理（初期値を-クールタイムに）
+    private float lastWhiteBlueSkillTime = -20f; // 白青スキルのクールタイム管理（初期値を-クールタイムに）
+    private bool[,] skillUnlocked = new bool[2, 4]; // [mode, color]
+
+    void Awake()
+    {
+        // テスト用：全スキル解放
+        for (int m = 0; m < 2; m++)
+            for (int c = 0; c < 4; c++)
+                skillUnlocked[m, c] = true;
+    }
 
     void Update()
     {
@@ -33,6 +44,14 @@ public class PlayerSkill : MonoBehaviour
 
     private void UseSkill(ColorType color)
     {
+        int m = (int)currentMode;
+        int c = (int)color;
+        if (!skillUnlocked[m, c])
+        {
+            Debug.Log("このスキルはまだ使えません");
+            return;
+        }
+
         if (currentMode == ModeType.White && color == ColorType.Red)
         {
             const float whiteRedSkillCooldown = 4f;
@@ -54,6 +73,10 @@ public class PlayerSkill : MonoBehaviour
                 Debug.Log($"白の赤魔法発動！攻撃力: {player.attackPower}（5秒間アップ）");
 
                 StartCoroutine(ResetAttackPowerAfterDelay(blackRedSkillCooldown, originalAttackPower));
+
+                // 白赤スキルアニメーション(7)再生（スキルアニメーション優先）
+                player.PlaySkillAnimation(7, 1.0f); // 1秒間再生（必要に応じて調整）
+                Debug.Log("白赤スキルアニメーション(7)再生");
 
                 // 白モードの赤魔法エフェクト発動（Y座標を1f下げて生成、1秒後に消す）
                 Vector3 spawnPos = player.transform.position + new Vector3(0, 0f, 0);
@@ -86,10 +109,46 @@ public class PlayerSkill : MonoBehaviour
                 Quaternion rot = isRight ? Quaternion.identity : Quaternion.Euler(0, 180f, 0);
                 GameObject fire = Instantiate(fireEffectPrefab, spawnPos, rot);
                 Debug.Log("黒の赤魔法発動！炎エフェクト生成（横に進む）");
+                // Animation 23 再生（スキルアニメーション優先）
+                player.PlaySkillAnimation(23, 1.0f); // 1秒間再生（必要に応じて調整）
+                Debug.Log("黒赤スキルアニメーション(23)再生");
             }
             else
             {
                 Debug.Log("Player参照またはfireEffectPrefabがありません");
+            }
+        }
+        else if (currentMode == ModeType.White && color == ColorType.Blue)
+        {
+            const float whiteBlueSkillCooldown = 20f;
+            if (Time.time - lastWhiteBlueSkillTime < whiteBlueSkillCooldown)
+            {
+                Debug.Log("白青スキルはクールタイム中です");
+                return;
+            }
+            lastWhiteBlueSkillTime = Time.time;
+            if (player != null)
+            {
+                player.BoostNextJump();
+                // エフェクト生成
+                if (whiteBlueEffectPrefab != null)
+                {
+                    Vector3 spawnPos = player.transform.position + new Vector3(0, 0.5f, 0);
+                    GameObject effect = Instantiate(whiteBlueEffectPrefab, spawnPos, Quaternion.identity);
+                    Destroy(effect, 1.5f);
+                    Debug.Log("白青スキルエフェクト発動！（1.5秒後に消滅）");
+                }
+                // ジャンプアニメーション再生
+                if (player.animatorController != null)
+                {
+                    player.animatorController.SetInt("Animation,16");
+                    Debug.Log("白青スキルジャンプアニメーション再生");
+                }
+                Debug.Log("白青スキル発動！次のジャンプ力が10fになります（1回のみ）");
+            }
+            else
+            {
+                Debug.Log("Player参照がありません");
             }
         }
         else
@@ -106,5 +165,22 @@ public class PlayerSkill : MonoBehaviour
             player.attackPower = originalPower;
             Debug.Log($"攻撃力が元に戻りました: {player.attackPower}");
         }
+    }
+
+    void UnlockSkillsForStage(int stage)
+    {
+        // 例: ステージ1は白赤のみ
+        for (int m = 0; m < 2; m++)
+            for (int c = 0; c < 4; c++)
+                skillUnlocked[m, c] = false;
+
+        if (stage == 1)
+            skillUnlocked[(int)ModeType.White, (int)ColorType.Red] = true;
+        else if (stage == 2)
+        {
+            skillUnlocked[(int)ModeType.White, (int)ColorType.Red] = true;
+            skillUnlocked[(int)ModeType.Black, (int)ColorType.Red] = true;
+        }
+        // ...以降ステージごとに解放
     }
 }

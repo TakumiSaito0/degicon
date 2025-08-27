@@ -9,7 +9,7 @@ public class Player : MonoBehaviour
     public bool facingRight = true;
 
     // AnimatorController�Q��
-    [SerializeField] private AnimatorController animatorController;
+    [SerializeField] public AnimatorController animatorController;
 
     [SerializeField] private float jumpForce = 5f; // �W�����v��
     private bool isJumping = false;
@@ -23,6 +23,10 @@ public class Player : MonoBehaviour
     private bool isInvincible = false; // 無敵状態フラグ
     private int health = 3; // プレイヤーのHP
     private bool isDead = false;
+
+    private bool nextJumpBoosted = false; // 次のジャンプがブーストされるフラグ
+    private bool isSkillAnimPlaying = false;
+    private float skillAnimTimer = 0f;
 
     private void OnEnable()
     {
@@ -59,7 +63,13 @@ public class Player : MonoBehaviour
         var rb = GetComponent<Rigidbody>();
         if (rb != null && Mathf.Abs(rb.linearVelocity.y) < 0.01f)
         {
-            rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+            float force = nextJumpBoosted ? 10f : jumpForce;
+            rb.AddForce(Vector3.up * force, ForceMode.Impulse);
+            if (nextJumpBoosted)
+            {
+                nextJumpBoosted = false;
+                Debug.Log("ジャンプ力増加ジャンプ（10f）");
+            }
         }
     }
     public void OnAttack(InputAction.CallbackContext context)
@@ -102,9 +112,29 @@ public class Player : MonoBehaviour
         }
     }
 
+    public void PlaySkillAnimation(int animValue, float duration)
+    {
+        if (animatorController != null)
+        {
+            animatorController.SetInt("Animation," + animValue);
+            isSkillAnimPlaying = true;
+            skillAnimTimer = duration;
+        }
+    }
+
     void Update()
     {
         if (isDead) return;
+        // スキルアニメーション優先
+        if (isSkillAnimPlaying)
+        {
+            skillAnimTimer -= Time.deltaTime;
+            if (skillAnimTimer <= 0f)
+            {
+                isSkillAnimPlaying = false;
+            }
+            return;
+        }
         Debug.Log("Update called"); // ���ꂪ�o�͂���邩�m�F
         // ���E�ړ��̂�
         Vector3 move = new Vector3(moveInput.x, 0, 0) * moveSpeed * Time.deltaTime;
@@ -249,6 +279,11 @@ public class Player : MonoBehaviour
                 rb.isKinematic = false;
             }
         }
+    }
+
+    public void BoostNextJump()
+    {
+        nextJumpBoosted = true;
     }
 
     private System.Collections.Generic.IEnumerator<UnityEngine.WaitForSeconds> InvincibleCoroutine()
