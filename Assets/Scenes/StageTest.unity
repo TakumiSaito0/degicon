@@ -3729,6 +3729,7 @@ MonoBehaviour:
   player: {fileID: 1940044769}
   fireEffectPrefab: {fileID: 2971538291341468558, guid: 3c92135bce5271c4285840395381ca1b, type: 3}
   whiteRedEffectPrefab: {fileID: 3280519133390621005, guid: a71be3e7990efb040a07565c43cbb198, type: 3}
+  whiteBlueEffectPrefab: {fileID: 0}
 --- !u!136 &1940044766
 CapsuleCollider:
   m_ObjectHideFlags: 0
