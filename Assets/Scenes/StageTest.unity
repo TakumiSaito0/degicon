@@ -854,7 +854,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 5
+  m_text: 20
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -1711,7 +1711,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 4
+  m_text: 15
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -3729,7 +3729,8 @@ MonoBehaviour:
   player: {fileID: 1940044769}
   fireEffectPrefab: {fileID: 2971538291341468558, guid: 3c92135bce5271c4285840395381ca1b, type: 3}
   whiteRedEffectPrefab: {fileID: 3280519133390621005, guid: a71be3e7990efb040a07565c43cbb198, type: 3}
-  whiteBlueEffectPrefab: {fileID: 0}
+  whiteBlueEffectPrefab: {fileID: 1399491476850481373, guid: 7e691a0229efacd4cba2922df3888456, type: 3}
+  bodyEffectPrefab: {fileID: 3732551427800355369, guid: 3e2226b0718f88b40ad98d970390f416, type: 3}
 --- !u!136 &1940044766
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -3809,7 +3810,7 @@ MonoBehaviour:
   moveSpeed: 10
   facingRight: 1
   animatorController: {fileID: 1940044768}
-  jumpForce: 10
+  jumpForce: 5
   attackBoxSize: {x: 1.5, y: 0.5, z: 1}
   attackPower: 1
 --- !u!114 &1940044770

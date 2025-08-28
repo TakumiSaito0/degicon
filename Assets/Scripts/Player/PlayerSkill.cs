@@ -10,9 +10,10 @@ public class PlayerSkill : MonoBehaviour
     [SerializeField] private GameObject fireEffectPrefab; // 黒赤スキル用エフェクト
     [SerializeField] private GameObject whiteRedEffectPrefab; // 白赤スキル用エフェクト
     [SerializeField] private GameObject whiteBlueEffectPrefab; // 白青スキル用エフェクト
+    [SerializeField] private GameObject bodyEffectPrefab; // 白赤スキル攻撃力アップ時の体エフェクト
 
     private ModeType currentMode = ModeType.White;
-    private float lastWhiteRedSkillTime = -4f; // 白赤スキルのクールタイム管理（初期値を-クールタイムに）
+    private float lastWhiteRedSkillTime = -15f; // 白赤スキルのクールタイム管理（初期値を-クールタイムに）
     private float lastBlackRedSkillTime = -7f; // 黒赤スキルのクールタイム管理（初期値を-クールタイムに）
     private float lastWhiteBlueSkillTime = -20f; // 白青スキルのクールタイム管理（初期値を-クールタイムに）
     private bool[,] skillUnlocked = new bool[2, 4]; // [mode, color]
@@ -39,6 +40,11 @@ public class PlayerSkill : MonoBehaviour
         {
             UseSkill(ColorType.Red);
         }
+        // Lキー：青（白青スキル発動）
+        if (UnityEngine.InputSystem.Keyboard.current.lKey.wasPressedThisFrame)
+        {
+            UseSkill(ColorType.Blue);
+        }
         // 他の色は省略
     }
 
@@ -54,8 +60,8 @@ public class PlayerSkill : MonoBehaviour
 
         if (currentMode == ModeType.White && color == ColorType.Red)
         {
-            const float whiteRedSkillCooldown = 4f;
-            const float blackRedSkillCooldown = 7f;
+            const float whiteRedSkillCooldown = 15f;
+            const float attackUpDuration = 5f;
 
             if (player != null && whiteRedEffectPrefab != null)
             {
@@ -72,7 +78,16 @@ public class PlayerSkill : MonoBehaviour
                 player.attackPower = Mathf.RoundToInt(originalAttackPower * 1.5f);
                 Debug.Log($"白の赤魔法発動！攻撃力: {player.attackPower}（5秒間アップ）");
 
-                StartCoroutine(ResetAttackPowerAfterDelay(blackRedSkillCooldown, originalAttackPower));
+                // 体エフェクト生成（攻撃力アップ中のみ表示）
+                GameObject bodyEffect = null;
+                if (bodyEffectPrefab != null)
+                {
+                    Vector3 bodyEffectPos = player.transform.position + new Vector3(0, -0.5f, 0); // Y座標を-0.5下げる
+                    bodyEffect = Instantiate(bodyEffectPrefab, bodyEffectPos, Quaternion.identity, player.transform);
+                    Debug.Log("白赤スキル体エフェクト生成（少し下に表示）");
+                }
+
+                StartCoroutine(ResetAttackPowerAfterDelayWithEffect(attackUpDuration, originalAttackPower, bodyEffect));
 
                 // 白赤スキルアニメーション(7)再生（スキルアニメーション優先）
                 player.PlaySkillAnimation(7, 1.0f); // 1秒間再生（必要に応じて調整）
@@ -138,12 +153,9 @@ public class PlayerSkill : MonoBehaviour
                     Destroy(effect, 1.5f);
                     Debug.Log("白青スキルエフェクト発動！（1.5秒後に消滅）");
                 }
-                // ジャンプアニメーション再生
-                if (player.animatorController != null)
-                {
-                    player.animatorController.SetInt("Animation,16");
-                    Debug.Log("白青スキルジャンプアニメーション再生");
-                }
+                // ジャンプアニメーション再生（animation7を再生）
+                player.PlaySkillAnimation(7, 1.0f); // 1秒間再生（必要に応じて調整）
+                Debug.Log("白青スキルアニメーション(7)再生");
                 Debug.Log("白青スキル発動！次のジャンプ力が10fになります（1回のみ）");
             }
             else
@@ -164,6 +176,21 @@ public class PlayerSkill : MonoBehaviour
         {
             player.attackPower = originalPower;
             Debug.Log($"攻撃力が元に戻りました: {player.attackPower}");
+        }
+    }
+
+    private IEnumerator ResetAttackPowerAfterDelayWithEffect(float delay, int originalPower, GameObject bodyEffect)
+    {
+        yield return new WaitForSeconds(delay);
+        if (player != null)
+        {
+            player.attackPower = originalPower;
+            Debug.Log($"攻撃力が元に戻りました: {player.attackPower}");
+        }
+        if (bodyEffect != null)
+        {
+            Destroy(bodyEffect);
+            Debug.Log("白赤スキル体エフェクト消滅");
         }
     }
 
