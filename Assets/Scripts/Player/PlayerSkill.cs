@@ -11,11 +11,13 @@ public class PlayerSkill : MonoBehaviour
     [SerializeField] private GameObject whiteRedEffectPrefab; // 白赤スキル用エフェクト
     [SerializeField] private GameObject whiteBlueEffectPrefab; // 白青スキル用エフェクト
     [SerializeField] private GameObject bodyEffectPrefab; // 白赤スキル攻撃力アップ時の体エフェクト
+    [SerializeField] private GameObject iceWallPrefab; // 黒青スキル用氷壁Prefab
 
     private ModeType currentMode = ModeType.White;
     private float lastWhiteRedSkillTime = -15f; // 白赤スキルのクールタイム管理（初期値を-クールタイムに）
     private float lastBlackRedSkillTime = -7f; // 黒赤スキルのクールタイム管理（初期値を-クールタイムに）
     private float lastWhiteBlueSkillTime = -20f; // 白青スキルのクールタイム管理（初期値を-クールタイムに）
+    private float lastBlackBlueSkillTime = -5f; // 黒青スキルのクールタイム管理
     private bool[,] skillUnlocked = new bool[2, 4]; // [mode, color]
 
     void Awake()
@@ -161,6 +163,31 @@ public class PlayerSkill : MonoBehaviour
             else
             {
                 Debug.Log("Player参照がありません");
+            }
+        }
+        else if (currentMode == ModeType.Black && color == ColorType.Blue)
+        {
+            const float blackBlueSkillCooldown = 5f;
+            if (Time.time - lastBlackBlueSkillTime < blackBlueSkillCooldown)
+            {
+                Debug.Log("黒青スキルはクールタイム中です");
+                return;
+            }
+            lastBlackBlueSkillTime = Time.time;
+            if (player != null && iceWallPrefab != null)
+            {
+                // プレイヤーの前方に氷壁を生成
+                float xOffset = player.facingRight ? 1.0f : -1.0f;
+                Vector3 spawnPos = player.transform.position + new Vector3(xOffset, 0.5f, 0);
+                Quaternion rot = player.facingRight ? Quaternion.identity : Quaternion.Euler(0, 180f, 0);
+                Instantiate(iceWallPrefab, spawnPos, rot);
+                // 黒青スキルアニメーション(24)再生
+                player.PlaySkillAnimation(24, 1.0f);
+                Debug.Log("黒青スキル（氷壁）発動！");
+            }
+            else
+            {
+                Debug.Log("Player/iceWallPrefab参照がありません");
             }
         }
         else
