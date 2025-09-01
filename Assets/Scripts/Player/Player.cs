@@ -90,14 +90,13 @@ public class Player : MonoBehaviour
             {
                 if (hit != null && hit.gameObject != null && hit.gameObject.CompareTag("Enemy"))
                 {
-              //      Debug.Log($"敵に攻撃！攻撃力: {attackPower}");
                     hitEnemy = true;
-                    // EnemyのHPを減らす処理
-                    var enemyScript = hit.gameObject.GetComponent<Enemy>();
-                    if (enemyScript != null)
+                    // BaseEnemyのHPを減らす処理
+                    var baseEnemy = hit.gameObject.GetComponent<BaseEnemy>();
+                    if (baseEnemy != null)
                     {
-                        enemyScript.TakeDamage(attackPower);
-                        Debug.Log($"Enemyに{attackPower}ダメージを与えた");
+                        baseEnemy.TakeDamage(attackPower);
+                        Debug.Log($"BaseEnemyに{attackPower}ダメージを与えた");
                     }
                 }
             }
