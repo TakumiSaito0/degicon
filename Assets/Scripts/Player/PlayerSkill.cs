@@ -176,13 +176,13 @@ public class PlayerSkill : MonoBehaviour
             lastBlackBlueSkillTime = Time.time;
             if (player != null && iceWallPrefab != null)
             {
-                // プレイヤーの前方に氷壁を生成
+                // プレイヤーの前方に氷壁を生成（Y座標を-0.5f下げる）
                 float xOffset = player.facingRight ? 1.0f : -1.0f;
-                Vector3 spawnPos = player.transform.position + new Vector3(xOffset, 0.5f, 0);
+                Vector3 spawnPos = player.transform.position + new Vector3(xOffset, -1f, 0.5f); // Y:-0.5f
                 Quaternion rot = player.facingRight ? Quaternion.identity : Quaternion.Euler(0, 180f, 0);
                 Instantiate(iceWallPrefab, spawnPos, rot);
-                // 黒青スキルアニメーション(24)再生
-                player.PlaySkillAnimation(24, 1.0f);
+                // 黒青スキルアニメーション(7)再生
+                player.PlaySkillAnimation(7, 1.0f);
                 Debug.Log("黒青スキル（氷壁）発動！");
             }
             else
