@@ -19,7 +19,7 @@ public class SkillUIManager : MonoBehaviour
 
     private ModeType currentMode = ModeType.White;
     private float[,] cooldowns = new float[2, 4]; // [mode, color]
-    private float[,] cooldownMax = new float[2, 4] { {15,20,5,5}, {7,5,5,5} }; // 例: 全スキル5秒
+    private float[,] cooldownMax = new float[2, 4] { {15,20,10,5}, {7,15,5,5} }; // 例: 全スキル5秒
 
     void Start()
     {
@@ -51,6 +51,11 @@ public class SkillUIManager : MonoBehaviour
         if (UnityEngine.InputSystem.Keyboard.current != null && UnityEngine.InputSystem.Keyboard.current.lKey.wasPressedThisFrame)
         {
             UseSkill(ColorType.Blue);
+        }
+        // Jキーで緑スキル発動（白緑スキル用）
+        if (UnityEngine.InputSystem.Keyboard.current != null && UnityEngine.InputSystem.Keyboard.current.jKey.wasPressedThisFrame)
+        {
+            UseSkill(ColorType.Green);
         }
         // クールタイム減算
         for (int m = 0; m < 2; m++)

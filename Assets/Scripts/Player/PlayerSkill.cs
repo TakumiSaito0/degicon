@@ -17,8 +17,18 @@ public class PlayerSkill : MonoBehaviour
     private float lastWhiteRedSkillTime = -15f; // 白赤スキルのクールタイム管理（初期値を-クールタイムに）
     private float lastBlackRedSkillTime = -7f; // 黒赤スキルのクールタイム管理（初期値を-クールタイムに）
     private float lastWhiteBlueSkillTime = -20f; // 白青スキルのクールタイム管理（初期値を-クールタイムに）
-    private float lastBlackBlueSkillTime = -5f; // 黒青スキルのクールタイム管理
+    private float lastBlackBlueSkillTime = -15f; // 黒青スキルのクールタイム管理
+    private float lastWhiteGreenSkillTime = -10f; // 白緑スキルのクールタイム管理
+ 
+    
+    // WhiteGreen
+    private const float burrowDuration = 3f;
+    private Vector3 burrowStartPos; // 潜伏開始位置
+    private bool isBurrowCoroutineRunning = false;
+    private Coroutine burrowCoroutineRef = null; // 潜伏コルーチン参照
+
     private bool[,] skillUnlocked = new bool[2, 4]; // [mode, color]
+   
 
     void Awake()
     {
@@ -46,6 +56,11 @@ public class PlayerSkill : MonoBehaviour
         if (UnityEngine.InputSystem.Keyboard.current.lKey.wasPressedThisFrame)
         {
             UseSkill(ColorType.Blue);
+        }
+        // Jキー：緑（白緑スキル発動）
+        if (UnityEngine.InputSystem.Keyboard.current.jKey.wasPressedThisFrame)
+        {
+            UseSkill(ColorType.Green);
         }
         // 他の色は省略
     }
@@ -190,19 +205,42 @@ public class PlayerSkill : MonoBehaviour
                 Debug.Log("Player/iceWallPrefab参照がありません");
             }
         }
+        else if (currentMode == ModeType.White && color == ColorType.Green)
+        {
+            const float whiteGreenSkillCooldown = 10f;
+            if (Time.time - lastWhiteGreenSkillTime < whiteGreenSkillCooldown)
+            {
+                Debug.Log("白緑スキルはクールタイム中です");
+                return;
+            }
+            if (player != null)
+            {
+                if (!player.isBurrowing && !isBurrowCoroutineRunning)
+                {
+                    lastWhiteGreenSkillTime = Time.time;
+                    burrowCoroutineRef = StartCoroutine(BurrowCoroutine());
+                    Debug.Log("白緑スキル発動！地面に潜って移動可能（3秒間）");
+                }
+                else if (player.isBurrowing && isBurrowCoroutineRunning)
+                {
+                    // 潜伏中に再発動→即座に地上復帰
+                    if (burrowCoroutineRef != null)
+                    {
+                        StopCoroutine(burrowCoroutineRef);
+                        burrowCoroutineRef = null;
+                    }
+                    EndBurrow();
+                    Debug.Log("白緑スキル再発動→地上復帰");
+                }
+            }
+            else
+            {
+                Debug.Log("Player参照がありません");
+            }
+        }
         else
         {
             Debug.Log($"現在は{currentMode}の{color}を発動しました");
-        }
-    }
-
-    private IEnumerator ResetAttackPowerAfterDelay(float delay, int originalPower)
-    {
-        yield return new WaitForSeconds(delay);
-        if (player != null)
-        {
-            player.attackPower = originalPower;
-            Debug.Log($"攻撃力が元に戻りました: {player.attackPower}");
         }
     }
 
@@ -219,6 +257,40 @@ public class PlayerSkill : MonoBehaviour
             Destroy(bodyEffect);
             Debug.Log("白赤スキル体エフェクト消滅");
         }
+    }
+
+    // 白緑スキル：地面に潜って移動できる
+    private IEnumerator BurrowCoroutine()
+    {
+        isBurrowCoroutineRunning = true;
+        player.isBurrowing = true;
+        player.PlaySkillAnimation(31, 0.5f);
+        yield return new WaitForSeconds(0.5f);
+        // 現在位置から深く潜る（Y:-2.0f）
+        player.transform.position += new Vector3(0, -2.0f, 0);
+        Collider col = player.GetComponent<Collider>();
+        if (col != null) col.enabled = false;
+        Rigidbody rb = player.GetComponent<Rigidbody>();
+        if (rb != null) rb.useGravity = false;
+        player.PlaySkillAnimation(25, burrowDuration);
+        yield return new WaitForSeconds(burrowDuration);
+        EndBurrow();
+        burrowCoroutineRef = null;
+    }
+
+    private void EndBurrow()
+    {
+        player.isBurrowing = false;
+        Vector3 pos = player.transform.position;
+        player.transform.position = new Vector3(pos.x, pos.y + 2.0f, pos.z);
+        Collider col = player.GetComponent<Collider>();
+        if (col != null) col.enabled = true;
+        Rigidbody rb = player.GetComponent<Rigidbody>();
+        if (rb != null) rb.useGravity = true;
+        isBurrowCoroutineRunning = false;
+        burrowCoroutineRef = null;
+        player.isSkillAnimPlaying = false;
+        Debug.Log("白緑スキル終了。通常状態に復帰");
     }
 
     void UnlockSkillsForStage(int stage)
