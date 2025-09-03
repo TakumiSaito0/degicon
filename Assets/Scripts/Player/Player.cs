@@ -25,8 +25,10 @@ public class Player : MonoBehaviour
     private bool isDead = false;
 
     private bool nextJumpBoosted = false; // 次のジャンプがブーストされるフラグ
-    private bool isSkillAnimPlaying = false;
+    public bool isSkillAnimPlaying = false;
     private float skillAnimTimer = 0f;
+
+    public bool isBurrowing = false; // 潜伏中フラグ
 
     private void OnEnable()
     {
@@ -54,6 +56,7 @@ public class Player : MonoBehaviour
     }
     public void OnJump(InputAction.CallbackContext context)
     {
+        if (isBurrowing) return; // 潜伏中はジャンプ不可
         if (animatorController != null)
         {
             animatorController.SetInt("Animation,16"); // Jump
@@ -124,6 +127,13 @@ public class Player : MonoBehaviour
     void Update()
     {
         if (isDead) return;
+        // 潜伏中は移動のみ可能（例：ジャンプ・攻撃・被ダメージなどを制限したい場合はここで分岐）
+        if (isBurrowing)
+        {
+            Vector3 burrowMove = new Vector3(moveInput.x, 0, 0) * moveSpeed * Time.deltaTime;
+            transform.Translate(burrowMove, Space.World);
+            return;
+        }
         // スキルアニメーション優先
         if (isSkillAnimPlaying)
         {
