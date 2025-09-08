@@ -3125,7 +3125,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 5
+  m_text: 15
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -3934,6 +3934,8 @@ MonoBehaviour:
   whiteBlueEffectPrefab: {fileID: 1399491476850481373, guid: 7e691a0229efacd4cba2922df3888456, type: 3}
   bodyEffectPrefab: {fileID: 3732551427800355369, guid: 3e2226b0718f88b40ad98d970390f416, type: 3}
   iceWallPrefab: {fileID: 453961772746521244, guid: f6d0986f5a75e684793194d8e8c8a403, type: 3}
+  plantPrefab: {fileID: 0}
+  whiteYellowEffectPrefab: {fileID: 0}
 --- !u!136 &1940044766
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -4016,6 +4018,7 @@ MonoBehaviour:
   jumpForce: 5
   attackBoxSize: {x: 1.5, y: 0.5, z: 1}
   attackPower: 1
+  isSkillAnimPlaying: 0
   isBurrowing: 0
 --- !u!114 &1940044770
 MonoBehaviour:

@@ -19,7 +19,7 @@ public class SkillUIManager : MonoBehaviour
 
     private ModeType currentMode = ModeType.White;
     private float[,] cooldowns = new float[2, 4]; // [mode, color]
-    private float[,] cooldownMax = new float[2, 4] { {15,20,10,5}, {7,15,5,5} }; // 例: 全スキル5秒
+    private float[,] cooldownMax = new float[2, 4] { {15,20,10,15}, {7,15,5,70} }; // 例: 全スキル5秒
 
     void Start()
     {
@@ -104,11 +104,28 @@ public class SkillUIManager : MonoBehaviour
         UpdateCooldownUI();
     }
 
+    // 黒緑スキルのUI使用不可表示
+    public void SetBlackGreenSkillUnavailable()
+    {
+        int m = (int)ModeType.Black;
+        int c = (int)ColorType.Green;
+        // アイコンをグレー化
+        skillIconsBlack[c].color = new Color(0.5f, 0.5f, 0.5f, 1f); // グレー
+        // テキストを「使用不可」に
+        cooldownTextsBlack[c].text = "使用不可";
+    }
+
     void UpdateCooldownUI()
     {
         int m = (int)currentMode;
         for (int i = 0; i < 4; i++)
         {
+            // 黒緑スキルはクールタイム管理しない
+            if (currentMode == ModeType.Black && i == (int)ColorType.Green)
+            {
+                // 何もせず（SetBlackGreenSkillUnavailableで制御）
+                continue;
+            }
             // 0未満になったら0に固定
             if (cooldowns[m, i] < 0) cooldowns[m, i] = 0;
             float cd = cooldowns[m, i];

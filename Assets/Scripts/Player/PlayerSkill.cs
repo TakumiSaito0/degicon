@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using System; // enumキャスト用
 
 public class PlayerSkill : MonoBehaviour
 {
@@ -12,6 +13,8 @@ public class PlayerSkill : MonoBehaviour
     [SerializeField] private GameObject whiteBlueEffectPrefab; // 白青スキル用エフェクト
     [SerializeField] private GameObject bodyEffectPrefab; // 白赤スキル攻撃力アップ時の体エフェクト
     [SerializeField] private GameObject iceWallPrefab; // 黒青スキル用氷壁Prefab
+    [SerializeField] private GameObject plantPrefab; // 黒緑スキル用植物Prefab
+    [SerializeField] private GameObject whiteYellowEffectPrefab; // 白黄スキル用エフェクト
 
     private ModeType currentMode = ModeType.White;
     private float lastWhiteRedSkillTime = -15f; // 白赤スキルのクールタイム管理（初期値を-クールタイムに）
@@ -19,6 +22,8 @@ public class PlayerSkill : MonoBehaviour
     private float lastWhiteBlueSkillTime = -20f; // 白青スキルのクールタイム管理（初期値を-クールタイムに）
     private float lastBlackBlueSkillTime = -15f; // 黒青スキルのクールタイム管理
     private float lastWhiteGreenSkillTime = -10f; // 白緑スキルのクールタイム管理
+    private float lastWhiteYellowSkillTime = -15f; // 白黄スキルのクールタイム管理（初期値を-クールタイムに）
+    private float lastBlackYellowSkillTime = -70f; // 黒黄スキルのクールタイム管理
  
     
     // WhiteGreen
@@ -62,7 +67,96 @@ public class PlayerSkill : MonoBehaviour
         {
             UseSkill(ColorType.Green);
         }
+        // Kキー：黄（白黄スキル発動）
+        if (UnityEngine.InputSystem.Keyboard.current.kKey.wasPressedThisFrame)
+        {
+            UseSkill(ColorType.Yellow);
+        }
         // 他の色は省略
+    }
+
+    // 黒緑スキルが使用可能か判定する
+    public bool CanUseBlackGreenSkill()
+    {
+        if (currentMode != ModeType.Black) return false;
+        // プレイヤーの前方にplantPrefabがあるか判定
+        Vector3 checkPos = player.transform.position + new Vector3(player.facingRight ? 1.0f : -1.0f, 0, 0);
+        Collider[] hits = Physics.OverlapSphere(checkPos, 1.0f);
+        foreach (var hit in hits)
+        {
+            if (hit != null && hit.gameObject != null && hit.gameObject.CompareTag("Plant"))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // 黒緑スキル発動処理
+    private void UseBlackGreenSkill()
+    {
+        // プレイヤーの前方にPlantがある場合のみ使用可能
+        Vector3 checkPos = player.transform.position + new Vector3(player.facingRight ? 1.0f : -1.0f, 0, 0);
+        Collider[] hits = Physics.OverlapSphere(checkPos, 1.0f);
+        bool foundPlant = false;
+        foreach (var hit in hits)
+        {
+            if (hit != null && hit.gameObject != null && hit.gameObject.CompareTag("Plant"))
+            {
+                var grow = hit.gameObject.GetComponent<PlantGrow>();
+                if (grow != null)
+                {
+                    foundPlant = true;
+                    grow.Grow();
+                    Debug.Log("黒緑スキル：植物を急成長させました");
+                }
+            }
+        }
+        // foundPlantがfalseなら何もせずreturn（UI通知はUseSkillで行う）
+        return;
+    }
+
+    private void UseWhiteYellowSkill()
+    {
+        if (player == null) return;
+        float teleportDistance = 5f;
+        Vector3 direction = player.facingRight ? Vector3.right : Vector3.left;
+        Vector3 start = player.transform.position;
+        RaycastHit hit;
+        Vector3 target;
+        if (Physics.Raycast(start, direction, out hit, teleportDistance))
+        {
+            // 障害物の手前まで
+            target = hit.point - direction * 0.5f;
+        }
+        else
+        {
+            // 障害物がなければ最大距離
+            target = start + direction * teleportDistance;
+        }
+        player.transform.position = target;
+        // エフェクト生成（任意）
+        if (whiteYellowEffectPrefab != null)
+        {
+            Instantiate(whiteYellowEffectPrefab, target, Quaternion.identity);
+        }
+        // 瞬間移動アニメーション（例: 21）
+        player.PlaySkillAnimation(21, 0.5f);
+        Debug.Log($"白黄スキル：{target}に瞬間移動しました");
+    }
+
+    private void UseBlackYellowSkill()
+    {
+        // HP回復（LifeManager参照）
+        if (LifeManager.instance != null)
+        {
+            LifeManager.instance.Heal(1);
+            Debug.Log("黒黄スキル：HPを1回復しました");
+        }
+        else
+        {
+            Debug.Log("LifeManagerが見つかりません");
+        }
     }
 
     private void UseSkill(ColorType color)
@@ -75,42 +169,44 @@ public class PlayerSkill : MonoBehaviour
             return;
         }
 
-        if (currentMode == ModeType.White && color == ColorType.Red)
+        if (currentMode == ModeType.Black && color == ColorType.Yellow)
+        {
+            const float blackYellowSkillCooldown = 70f;
+            if (Time.time - lastBlackYellowSkillTime < blackYellowSkillCooldown)
+            {
+                Debug.Log("黒黄スキルはクールタイム中です");
+                return;
+            }
+            lastBlackYellowSkillTime = Time.time;
+            SkillUIManager ui = FindObjectOfType<SkillUIManager>();
+            if (ui != null) ui.UseSkill((SkillUIManager.ColorType)Enum.Parse(typeof(SkillUIManager.ColorType), color.ToString()));
+            UseBlackYellowSkill();
+        }
+        else if (currentMode == ModeType.White && color == ColorType.Red)
         {
             const float whiteRedSkillCooldown = 15f;
             const float attackUpDuration = 5f;
-
             if (player != null && whiteRedEffectPrefab != null)
             {
-                // クールタイム判定
                 if (Time.time - lastWhiteRedSkillTime < whiteRedSkillCooldown)
                 {
                     Debug.Log("白赤スキルはクールタイム中です");
                     return;
                 }
                 lastWhiteRedSkillTime = Time.time;
-
-                // 攻撃力アップ（5秒間のみ）
                 int originalAttackPower = player.attackPower;
                 player.attackPower = Mathf.RoundToInt(originalAttackPower * 1.5f);
                 Debug.Log($"白の赤魔法発動！攻撃力: {player.attackPower}（5秒間アップ）");
-
-                // 体エフェクト生成（攻撃力アップ中のみ表示）
                 GameObject bodyEffect = null;
                 if (bodyEffectPrefab != null)
                 {
-                    Vector3 bodyEffectPos = player.transform.position + new Vector3(0, -0.5f, 0); // Y座標を-0.5下げる
+                    Vector3 bodyEffectPos = player.transform.position + new Vector3(0, -0.5f, 0);
                     bodyEffect = Instantiate(bodyEffectPrefab, bodyEffectPos, Quaternion.identity, player.transform);
                     Debug.Log("白赤スキル体エフェクト生成（少し下に表示）");
                 }
-
                 StartCoroutine(ResetAttackPowerAfterDelayWithEffect(attackUpDuration, originalAttackPower, bodyEffect));
-
-                // 白赤スキルアニメーション(7)再生（スキルアニメーション優先）
-                player.PlaySkillAnimation(7, 1.0f); // 1秒間再生（必要に応じて調整）
+                player.PlaySkillAnimation(7, 1.0f);
                 Debug.Log("白赤スキルアニメーション(7)再生");
-
-                // 白モードの赤魔法エフェクト発動（Y座標を1f下げて生成、1秒後に消す）
                 Vector3 spawnPos = player.transform.position + new Vector3(0, 0f, 0);
                 GameObject effect = Instantiate(whiteRedEffectPrefab, spawnPos, Quaternion.identity);
                 Destroy(effect, 1f);
@@ -126,23 +222,19 @@ public class PlayerSkill : MonoBehaviour
             const float blackRedSkillCooldown = 7f;
             if (player != null && fireEffectPrefab != null)
             {
-                // クールタイム判定
                 if (Time.time - lastBlackRedSkillTime < blackRedSkillCooldown)
                 {
                     Debug.Log("黒赤スキルはクールタイム中です");
                     return;
                 }
                 lastBlackRedSkillTime = Time.time;
-
-                // Playerの向きで発射方向を決定
                 bool isRight = player.facingRight;
                 float xOffset = isRight ? 1f : -1f;
                 Vector3 spawnPos = player.transform.position + new Vector3(xOffset, 0.5f, 0);
                 Quaternion rot = isRight ? Quaternion.identity : Quaternion.Euler(0, 180f, 0);
                 GameObject fire = Instantiate(fireEffectPrefab, spawnPos, rot);
                 Debug.Log("黒の赤魔法発動！炎エフェクト生成（横に進む）");
-                // Animation 23 再生（スキルアニメーション優先）
-                player.PlaySkillAnimation(23, 1.0f); // 1秒間再生（必要に応じて調整）
+                player.PlaySkillAnimation(23, 1.0f);
                 Debug.Log("黒赤スキルアニメーション(23)再生");
             }
             else
@@ -162,7 +254,6 @@ public class PlayerSkill : MonoBehaviour
             if (player != null)
             {
                 player.BoostNextJump();
-                // エフェクト生成
                 if (whiteBlueEffectPrefab != null)
                 {
                     Vector3 spawnPos = player.transform.position + new Vector3(0, 0.5f, 0);
@@ -170,8 +261,7 @@ public class PlayerSkill : MonoBehaviour
                     Destroy(effect, 1.5f);
                     Debug.Log("白青スキルエフェクト発動！（1.5秒後に消滅）");
                 }
-                // ジャンプアニメーション再生（animation7を再生）
-                player.PlaySkillAnimation(7, 1.0f); // 1秒間再生（必要に応じて調整）
+                player.PlaySkillAnimation(7, 1.0f);
                 Debug.Log("白青スキルアニメーション(7)再生");
                 Debug.Log("白青スキル発動！次のジャンプ力が10fになります（1回のみ）");
             }
@@ -191,12 +281,10 @@ public class PlayerSkill : MonoBehaviour
             lastBlackBlueSkillTime = Time.time;
             if (player != null && iceWallPrefab != null)
             {
-                // プレイヤーの前方に氷壁を生成（Y座標を-0.5f下げる）
                 float xOffset = player.facingRight ? 1.0f : -1.0f;
-                Vector3 spawnPos = player.transform.position + new Vector3(xOffset, -1f, 0.5f); // Y:-0.5f
+                Vector3 spawnPos = player.transform.position + new Vector3(xOffset, -1f, 0.5f);
                 Quaternion rot = player.facingRight ? Quaternion.identity : Quaternion.Euler(0, 180f, 0);
                 Instantiate(iceWallPrefab, spawnPos, rot);
-                // 黒青スキルアニメーション(7)再生
                 player.PlaySkillAnimation(7, 1.0f);
                 Debug.Log("黒青スキル（氷壁）発動！");
             }
@@ -223,7 +311,6 @@ public class PlayerSkill : MonoBehaviour
                 }
                 else if (player.isBurrowing && isBurrowCoroutineRunning)
                 {
-                    // 潜伏中に再発動→即座に地上復帰
                     if (burrowCoroutineRef != null)
                     {
                         StopCoroutine(burrowCoroutineRef);
@@ -237,6 +324,30 @@ public class PlayerSkill : MonoBehaviour
             {
                 Debug.Log("Player参照がありません");
             }
+        }
+        else if (currentMode == ModeType.Black && color == ColorType.Green)
+        {
+            if (!CanUseBlackGreenSkill())
+            {
+                SkillUIManager ui = FindObjectOfType<SkillUIManager>();
+                if (ui != null) ui.SetBlackGreenSkillUnavailable();
+                Debug.Log("黒緑スキルは使用できません（植物が目の前にありません）");
+                return;
+            }
+            UseBlackGreenSkill();
+        }
+        else if (currentMode == ModeType.White && color == ColorType.Yellow)
+        {
+            const float whiteYellowSkillCooldown = 15f;
+            if (Time.time - lastWhiteYellowSkillTime < whiteYellowSkillCooldown)
+            {
+                Debug.Log("白黄スキルはクールタイム中です");
+                return;
+            }
+            lastWhiteYellowSkillTime = Time.time;
+            SkillUIManager ui = FindObjectOfType<SkillUIManager>();
+            if (ui != null) ui.UseSkill((SkillUIManager.ColorType)Enum.Parse(typeof(SkillUIManager.ColorType), color.ToString()));
+            UseWhiteYellowSkill();
         }
         else
         {
@@ -308,5 +419,14 @@ public class PlayerSkill : MonoBehaviour
             skillUnlocked[(int)ModeType.Black, (int)ColorType.Red] = true;
         }
         // ...以降ステージごとに解放
+    }
+}
+
+// 仮のPlantGrowクラス（本来は植物の成長処理を持つ）
+public class PlantGrow : MonoBehaviour
+{
+    public void Grow()
+    {
+        // 植物の成長処理
     }
 }
