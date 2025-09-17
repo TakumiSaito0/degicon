@@ -115,6 +115,24 @@ public class SkillUIManager : MonoBehaviour
         cooldownTextsBlack[c].text = "使用不可";
     }
 
+    // 黒緑スキルのUI表示を更新（近くにPlantがあれば緑、なければグレー）
+    public void UpdateBlackGreenSkillIcon(bool canUse)
+    {
+        int c = (int)ColorType.Green;
+        if (canUse)
+        {
+            // 緑色（例: Color.green）
+            skillIconsBlack[c].color = Color.green;
+            cooldownTextsBlack[c].text = "Ready";
+        }
+        else
+        {
+            // グレー
+            skillIconsBlack[c].color = new Color(0.5f, 0.5f, 0.5f, 1f);
+            cooldownTextsBlack[c].text = "使用不可";
+        }
+    }
+
     void UpdateCooldownUI()
     {
         int m = (int)currentMode;

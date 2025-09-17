@@ -12,7 +12,7 @@ public class Player : MonoBehaviour
     [SerializeField] public AnimatorController animatorController;
 
     [SerializeField] private float jumpForce = 5f; // �W�����v��
-    private bool isJumping = false;
+    public bool isJumping = false;
     private bool isAttacking = false;
     private float attackDuration = 0.5f; // 攻撃アニメーションの長さ（秒）
     private float attackTimer = 0f;

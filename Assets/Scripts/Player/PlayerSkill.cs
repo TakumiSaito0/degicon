@@ -73,6 +73,17 @@ public class PlayerSkill : MonoBehaviour
             UseSkill(ColorType.Yellow);
         }
         // 他の色は省略
+
+        // 黒緑スキルのUI表示を毎フレーム更新（黒モード時のみ）
+        if (currentMode == ModeType.Black)
+        {
+            SkillUIManager ui = FindObjectOfType<SkillUIManager>();
+            if (ui != null)
+            {
+                bool canUse = CanUseBlackGreenSkill();
+                ui.UpdateBlackGreenSkillIcon(canUse);
+            }
+        }
     }
 
     // 黒緑スキルが使用可能か判定する
@@ -303,6 +314,11 @@ public class PlayerSkill : MonoBehaviour
             }
             if (player != null)
             {
+                if (player.isJumping)
+                {
+                    Debug.Log("空中では白緑スキルを使えません");
+                    return;
+                }
                 if (!player.isBurrowing && !isBurrowCoroutineRunning)
                 {
                     lastWhiteGreenSkillTime = Time.time;
