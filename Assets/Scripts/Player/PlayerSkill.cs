@@ -168,6 +168,11 @@ public class PlayerSkill : MonoBehaviour
         {
             Debug.Log("LifeManager‚ªŒ©‚Â‚©‚è‚Ü‚¹‚ñ");
         }
+        // Animation32‚ğÄ¶
+        if (player != null)
+        {
+            player.PlaySkillAnimation(32, 1.0f);
+        }
     }
 
     private void UseSkill(ColorType color)
