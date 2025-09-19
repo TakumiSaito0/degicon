@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: db039445b3930464da26a29fc2746c6c
+timeCreated: 1509993637
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 104698
+  packageName: 2.5D tile editor
+  packageVersion: 1.4
+  assetPath: Assets/2.5DTileEditor/Tilesets/Factory/Materials/Frame.mat
+  uploadId: 570581

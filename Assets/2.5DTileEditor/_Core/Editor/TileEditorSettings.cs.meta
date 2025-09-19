@@ -1,0 +1,20 @@
+fileFormatVersion: 2
+guid: d528d41fed0c2654fb8795a11ccbe73f
+timeCreated: 1545336268
+licenseType: Store
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 104698
+  packageName: 2.5D tile editor
+  packageVersion: 1.4
+  assetPath: Assets/2.5DTileEditor/_Core/Editor/TileEditorSettings.cs
+  uploadId: 570581

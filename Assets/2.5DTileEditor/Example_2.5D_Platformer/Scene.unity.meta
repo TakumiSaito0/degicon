@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 0dfa0fd56870ffb468f16cc4ea98a5b2
+timeCreated: 1510258900
+licenseType: Store
+DefaultImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 104698
+  packageName: 2.5D tile editor
+  packageVersion: 1.4
+  assetPath: Assets/2.5DTileEditor/Example_2.5D_Platformer/Scene.unity
+  uploadId: 570581

@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: e69f8735dc03f6d44bcd4ce6b8e58507
+timeCreated: 1531316846
+licenseType: Store
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 104698
+  packageName: 2.5D tile editor
+  packageVersion: 1.4
+  assetPath: Assets/2.5DTileEditor/_Core/TileEditorDoc.pdf
+  uploadId: 570581

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: b43b74ed9e804ea4c86da3e42fad873e
+timeCreated: 1510352459
+licenseType: Store
+DefaultImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 104698
+  packageName: 2.5D tile editor
+  packageVersion: 1.4
+  assetPath: Assets/2.5DTileEditor/Example_RollABall/Scene.unity
+  uploadId: 570581

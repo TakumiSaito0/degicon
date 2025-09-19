@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 64e8935028c05fe41b93ff6cf57bf766
+timeCreated: 1505913750
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 104698
+  packageName: 2.5D tile editor
+  packageVersion: 1.4
+  assetPath: Assets/2.5DTileEditor/Tilesets/Castle/Materials/BlueBricks.mat
+  uploadId: 570581
