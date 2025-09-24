@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: c2fb8aa0bc75c4a41b6e11f814e36fde
+timeCreated: 1510404470
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 104698
+  packageName: 2.5D tile editor
+  packageVersion: 1.4
+  assetPath: Assets/2.5DTileEditor/Tilesets/Grass/TilesetDirt.prefab
+  uploadId: 570581

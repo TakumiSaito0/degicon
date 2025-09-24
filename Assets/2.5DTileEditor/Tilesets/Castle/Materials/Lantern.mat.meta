@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 217672677242c704188b6ded2216266c
+timeCreated: 1506623673
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 104698
+  packageName: 2.5D tile editor
+  packageVersion: 1.4
+  assetPath: Assets/2.5DTileEditor/Tilesets/Castle/Materials/Lantern.mat
+  uploadId: 570581

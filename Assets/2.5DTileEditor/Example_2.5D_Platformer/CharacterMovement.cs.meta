@@ -1,0 +1,19 @@
+fileFormatVersion: 2
+guid: c9b7189098748614f92e3352db47ebd9
+timeCreated: 1510343946
+licenseType: Store
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 104698
+  packageName: 2.5D tile editor
+  packageVersion: 1.4
+  assetPath: Assets/2.5DTileEditor/Example_2.5D_Platformer/CharacterMovement.cs
+  uploadId: 570581

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: ac2f4db9c31d7c041ac891476387911d
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 4890085278179872738
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 104698
+  packageName: 2.5D tile editor
+  packageVersion: 1.4
+  assetPath: Assets/2.5DTileEditor/Example_2.5D_Platformer/SceneSettings.lighting
+  uploadId: 570581

@@ -1,0 +1,20 @@
+fileFormatVersion: 2
+guid: 8c87e91759d8d1d438f4f89a8147fa6b
+timeCreated: 1545864867
+licenseType: Store
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 104698
+  packageName: 2.5D tile editor
+  packageVersion: 1.4
+  assetPath: Assets/2.5DTileEditor/_Core/Editor/TileSetExt.cs
+  uploadId: 570581

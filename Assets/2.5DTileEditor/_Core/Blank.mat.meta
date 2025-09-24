@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 477e2cb3620227842872d874e0422ff6
+timeCreated: 1510258737
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 104698
+  packageName: 2.5D tile editor
+  packageVersion: 1.4
+  assetPath: Assets/2.5DTileEditor/_Core/Blank.mat
+  uploadId: 570581

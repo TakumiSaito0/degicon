@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 8b83d444fe1b45f4bbcff304632141b9
+timeCreated: 1509993634
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 104698
+  packageName: 2.5D tile editor
+  packageVersion: 1.4
+  assetPath: Assets/2.5DTileEditor/Tilesets/Castle/Materials/BricksDetail.mat
+  uploadId: 570581

@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 47877907e5c570a49b5c24480255a4d3
+timeCreated: 1509993634
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 104698
+  packageName: 2.5D tile editor
+  packageVersion: 1.4
+  assetPath: Assets/2.5DTileEditor/Tilesets/Castle/Materials/ObsBrickFace.mat
+  uploadId: 570581
